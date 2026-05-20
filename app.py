@@ -175,7 +175,7 @@ if city_data:
     for _, row in df_all.iterrows():
         c = row['Color']
         bg = "rgba(0,0,0,0.02)"
-        card_html += f"""<div style="background:#ffffff;border:1px solid #e2e8f0;border-top:4px solid {c};border-radius:12px;padding:16px;box-shadow:0 1px 4px rgba(0,0,0,0.06);"><div style="font-size:12px;font-weight:600;color:#64748b;margin-bottom:8px;text-transform:uppercase;letter-spacing:0.5px;">{row['City']}</div><div style="font-size:32px;font-weight:800;color:{c};line-height:1;margin-bottom:4px;">{row['PM2.5'] or 'N/A'}</div><div style="font-size:11px;color:#94a3b8;margin-bottom:10px;">PM2.5 µg/m³</div><div style="display:inline-block;font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;color:{c};background:rgba(0,0,0,0.04);border:1px solid {c};">{row['Category']}</div></div>"""
+        card_html += f"""<div style="background:#ffffff;border:1px solid #e2e8f0;border-top:4px solid {c};border-radius:12px;padding:16px;box-shadow:0 1px 4px rgba(0,0,0,0.06);"><div style="font-size:12px;font-weight:600;color:#64748b;margin-bottom:8px;text-transform:uppercase;letter-spacing:0.5px;">{row['City']}</div><div style="font-size:32px;font-weight:800;color:{c};line-height:1;margin-bottom:4px;">{row['PM2.5'] or 'N/A'}</div><div style="font-size:11px;color:#94a3b8;margin-bottom:10px;">PM2.5 &micro;g/m&sup3;</div><div style="display:inline-block;font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;color:{c};background:rgba(0,0,0,0.04);border:1px solid {c};">{row['Category']}</div></div>"""
     card_html += '</div>'
     st.markdown(card_html, unsafe_allow_html=True)
 
