@@ -52,15 +52,6 @@ App opens at `http://localhost:8501`
 
 ---
 
-## ☁️ Deploy on Streamlit Cloud (Free)
-
-1. Push this repo to GitHub
-2. Go to [share.streamlit.io](https://share.streamlit.io)
-3. Connect your GitHub → select `app.py`
-4. Click **Deploy** — live link generated in ~2 minutes
-
----
-
 ## 🔌 Data Source
 
 | Source | Endpoint | Cost |
@@ -86,27 +77,3 @@ Update frequency: hourly from API, app refreshes every 10 min (cached)
 | Open-Meteo | Free real-time AQI data |
 
 ---
-
-## 📈 What I Learned
-
-- Fetching and parsing JSON from REST APIs in Python
-- Caching API responses with `st.cache_data` to avoid rate limits
-- Storing time-series data in SQLite for historical trend analysis
-- Building multi-chart dashboards with Plotly (line, bar, radar, choropleth)
-- Deploying a live Python app on Streamlit Cloud
-
----
-
-## 🗺️ Roadmap (Databricks Migration)
-
-- [ ] Migrate ingestion layer to Databricks notebook + Delta Lake
-- [ ] PySpark transformations for Bronze → Silver → Gold architecture
-- [ ] Databricks SQL Dashboard for team-level sharing
-- [ ] Add ARIMA forecasting for next-24-hour AQI prediction
-
----
-
-## 👩‍💻 Author
-
-**Khushika Surana** — B.Tech CSE (Data Science), RBU Nagpur  
-[GitHub](https://github.com/khushikaa18) · [LinkedIn](#)
