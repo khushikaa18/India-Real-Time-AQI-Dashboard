@@ -133,15 +133,30 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # ─── Header ──────────────────────────────────────────────────────────────────────
-st.markdown('''
-<div style="padding-top:20px;margin-bottom:4px;">
-    <div style="font-size:28px;color:#131413;font-weight:500;letter-spacing:0.5px;margin-bottom:2px;">INDIA REAL-TIME</div>
-    <div style="font-size:36px;font-weight:800;line-height:1.1;">
-        <span style="color:#0f172a;">AQI </span>
-        <span style="color:#16a34a;">Dashboard</span>
+now_str = datetime.now().strftime('%d %b %Y, %I:%M %p')
+st.markdown(f"""
+<div style="margin-bottom:24px;animation:slide-up 0.5s ease-out;">
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px;">
+        <div style="font-size:32px;font-weight:900;color:#0f172a;letter-spacing:-0.8px;line-height:1.1;">
+            India Real-Time
+        </div>
+    </div>
+    <div style="display:flex;align-items:baseline;gap:10px;margin-bottom:10px;">
+        <div style="font-size:32px;font-weight:900;letter-spacing:-0.8px;line-height:1.1;">
+            <span style="color:#0f172a;">AQI </span><span style="color:#0d9488;">Dashboard</span>
+        </div>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px;">
+        <div style="width:7px;height:7px;border-radius:50%;background:#10b981;
+                    animation:breathe 2.5s ease-in-out infinite;
+                    box-shadow:0 0 6px rgba(16,185,129,0.4);"></div>
+        <span style="font-size:12px;color:#64748b;font-weight:500;">
+            Last refreshed: {now_str} · Deep dive: <strong style="color:#0f172a;">{selected_city}</strong>
+        </span>
     </div>
 </div>
-''', unsafe_allow_html=True)
+""", unsafe_allow_html=True)
+conn = init_db()
 
 conn = init_db()
 
