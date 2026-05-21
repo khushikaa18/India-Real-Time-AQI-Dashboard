@@ -209,7 +209,7 @@ if city_data:
 
     st.divider()
 
-    # ── Bar Chart ─────────────────────────────────────────────────────────────
+    # ── Bar Chart ────────────────────────────────────────────────────────────
     df_sorted = df_all.sort_values("PM2.5", ascending=True).reset_index(drop=True)
     bar_colors = [row["Color"] for _, row in df_sorted.iterrows()]
 
@@ -223,8 +223,8 @@ if city_data:
         ),
         text=df_sorted["PM2.5"],
         textposition="outside",
+        textfont=dict(size=11, color="#1e293b"),
     ))
-    fig_bar.update_traces(textfont_size=11, textfont_color="#1e293b")
     fig_bar.update_layout(
         title="PM2.5 Levels Across Indian Cities (ug/m3)",
         plot_bgcolor="#ffffff",
@@ -247,6 +247,8 @@ if city_data:
         annotation_font_size=11,
     )
     st.plotly_chart(fig_bar, use_container_width=True)
+  
+        
 
 # ─── Deep Dive ───────────────────────────────────────────────────────────────────
 st.markdown(f'<div style="font-size:15px;font-weight:700;color:#1e293b;margin:8px 0 10px;">🔍 Deep Dive — {selected_city}</div>', unsafe_allow_html=True)
