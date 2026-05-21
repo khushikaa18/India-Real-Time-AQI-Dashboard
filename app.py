@@ -160,6 +160,16 @@ conn = init_db()
 
 conn = init_db()
 
+# ─── Shared Chart Layout ──────────────────────────────────────────────────────────
+CHART_LAYOUT = dict(
+    plot_bgcolor="#ffffff",
+    paper_bgcolor="#ffffff",
+    font=dict(family="Plus Jakarta Sans, sans-serif", color="#334155", size=12),
+    xaxis=dict(gridcolor="#f1f5f9", zerolinecolor="#f1f5f9", tickfont=dict(color="#64748b", size=11)),
+    yaxis=dict(gridcolor="#f1f5f9", zerolinecolor="#f1f5f9", tickfont=dict(color="#64748b", size=11)),
+    margin=dict(l=0, r=20, t=56, b=20),
+)
+
 # ─── All Cities ──────────────────────────────────────────────────────────────────
 st.markdown('<div style="font-size:15px;font-weight:700;color:#1e293b;margin:16px 0 10px;">📊 All Cities Overview</div>', unsafe_allow_html=True)
 
