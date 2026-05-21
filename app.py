@@ -210,41 +210,35 @@ if city_data:
     st.divider()
 
     # ── Bar Chart ────────────────────────────────────────────────────────────
-    df_sorted = df_all.sort_values("PM2.5", ascending=True).reset_index(drop=True)
-    bar_colors = [row["Color"] for _, row in df_sorted.iterrows()]
-
-    fig_bar = go.Figure(go.Bar(
-        x=df_sorted["PM2.5"],
-        y=df_sorted["City"],
-        orientation="h",
-        marker=dict(
-            color=bar_colors,
-            line=dict(width=0),
-        ),
-        text=df_sorted["PM2.5"],
-        textposition="outside",
-        textfont=dict(size=11, color="#1e293b"),
-    ))
+    df_sorted = df_all.sort_values("PM2.5", ascending=True)
+    fig_bar = px.bar(
+        df_sorted,
+        x="PM2.5", y="City", orientation="h",
+        color="PM2.5",
+        color_continuous_scale=["#059669","#d97706","#ea580c","#dc2626","#7c3aed"],
+        height=400,
+    )
+    fig_bar.update_traces(marker_line_width=0, marker_cornerradius=5)
     fig_bar.update_layout(
-        title="PM2.5 Levels Across Indian Cities (ug/m3)",
-        plot_bgcolor="#ffffff",
-        paper_bgcolor="#ffffff",
-        font_color="#1e293b",
-        title_font_size=14,
-        xaxis=dict(gridcolor="#f1f5f9", showgrid=True, zeroline=False),
-        yaxis=dict(gridcolor="#f1f5f9", showgrid=False),
-        margin=dict(l=0, r=60, t=40, b=0),
-        height=380,
-        bargap=0.3,
+        **CHART_LAYOUT,
+        title=dict(
+            text="<b>PM2.5 Levels Across Indian Cities</b><br><span style='font-size:12px;color:#94a3b8;'>Concentration in µg/m³</span>",
+            font=dict(size=14, color="#0f172a"),
+        ),
+        coloraxis_showscale=False,
     )
     fig_bar.add_vline(
-        x=35.4,
-        line_dash="dash",
-        line_color="#ca8a04",
-        annotation_text="Moderate",
-        annotation_font_color="#ca8a04",
-        annotation_position="top",
-        annotation_font_size=11,
+        x=35.4, line_dash="dot", line_color="#d97706", line_width=2,
+    )
+    fig_bar.add_annotation(
+        x=35.4, y=1.06, yref="paper",
+        text="<b>  Moderate Threshold  </b>",
+        showarrow=False,
+        font=dict(color="#d97706", size=11, family="Plus Jakarta Sans, sans-serif"),
+        bgcolor="#fffbeb",
+        bordercolor="#d97706",
+        borderwidth=1.5,
+        borderpad=6,
     )
     st.plotly_chart(fig_bar, use_container_width=True)
   
