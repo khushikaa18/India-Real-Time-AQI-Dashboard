@@ -133,8 +133,15 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # ─── Header ──────────────────────────────────────────────────────────────────────
-st.title("🌍 India Real-Time AQI Dashboard")
-st.caption(f"Last refreshed: {datetime.now().strftime('%d %b %Y, %I:%M %p')}  ·  Deep dive: **{selected_city}**")
+st.markdown('''
+<div style="padding-top:8px;margin-bottom:4px;">
+    <div style="font-size:14px;color:#64748b;font-weight:500;letter-spacing:0.5px;margin-bottom:2px;">INDIA REAL-TIME</div>
+    <div style="font-size:36px;font-weight:800;line-height:1.1;">
+        <span style="color:#0f172a;">AQI </span>
+        <span style="color:#16a34a;">Dashboard</span>
+    </div>
+</div>
+''', unsafe_allow_html=True)
 
 conn = init_db()
 
