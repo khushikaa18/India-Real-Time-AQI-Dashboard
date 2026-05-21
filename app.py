@@ -111,7 +111,7 @@ with st.sidebar:
 # ─── Global CSS ──────────────────────────────────────────────────────────────────
 st.markdown("""
 <style>
-    .block-container { padding-top: 1.5rem !important; }
+    .block-container { padding-top: 3rem !important; }
     h1 { font-size: 2rem !important; font-weight: 800 !important; color: #0f172a !important; }
     [data-testid="metric-container"] {
         background: #ffffff;
