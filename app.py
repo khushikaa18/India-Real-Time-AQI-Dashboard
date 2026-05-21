@@ -192,7 +192,7 @@ if city_data:
         df_all.sort_values("PM2.5", ascending=True),
         x="PM2.5", y="City", orientation="h",
         color="PM2.5",
-        color_continuous_scale=["#16a34a", "#ca8a04", "#ea580c", "#dc2626", "#7c3aed"],
+       color_continuous_scale=["#16a34a", "#ca8a04", "#ea580c", "#dc2626", "#7f1d1d"],
         title="PM2.5 Levels Across Indian Cities (ug/m3)",
         height=380,
     )
