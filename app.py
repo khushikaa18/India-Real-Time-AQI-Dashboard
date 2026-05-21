@@ -208,8 +208,8 @@ if city_data:
         ),
         text=df_sorted["PM2.5"],
         textposition="outside",
-        textfont=dict(size=11, color="#1e293b"),
     ))
+    fig_bar.update_traces(textfont_size=11, textfont_color="#1e293b")
     fig_bar.update_layout(
         title="PM2.5 Levels Across Indian Cities (ug/m3)",
         plot_bgcolor="#ffffff",
