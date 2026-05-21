@@ -188,29 +188,38 @@ if city_data:
     st.divider()
 
     # ── Bar Chart ─────────────────────────────────────────────────────────────
-    fig_bar = px.bar(
-        df_all.sort_values("PM2.5", ascending=True),
-        x="PM2.5", y="City", orientation="h",
-        color="PM2.5",
-       color_continuous_scale=["#16a34a", "#ca8a04", "#ea580c", "#dc2626", "#7f1d1d"],
-        title="PM2.5 Levels Across Indian Cities (ug/m3)",
-        height=380,
-    )
+    df_sorted = df_all.sort_values("PM2.5", ascending=True).reset_index(drop=True)
+    bar_colors = [row["Color"] for _, row in df_sorted.iterrows()]
+
+    fig_bar = go.Figure(go.Bar(
+        x=df_sorted["PM2.5"],
+        y=df_sorted["City"],
+        orientation="h",
+        marker=dict(
+            color=bar_colors,
+            line=dict(width=0),
+        ),
+        text=df_sorted["PM2.5"],
+        textposition="outside",
+        textfont=dict(size=11, color="#1e293b"),
+    ))
     fig_bar.update_layout(
-        plot_bgcolor="#f8fafc",
+        title="PM2.5 Levels Across Indian Cities (ug/m3)",
+        plot_bgcolor="#ffffff",
         paper_bgcolor="#ffffff",
         font_color="#1e293b",
         title_font_size=14,
-        coloraxis_showscale=False,
-        xaxis=dict(gridcolor="#e2e8f0"),
-        yaxis=dict(gridcolor="#e2e8f0"),
-        margin=dict(l=0, r=20, t=40, b=0),
+        xaxis=dict(gridcolor="#f1f5f9", showgrid=True, zeroline=False),
+        yaxis=dict(gridcolor="#f1f5f9", showgrid=False),
+        margin=dict(l=0, r=60, t=40, b=0),
+        height=380,
+        bargap=0.3,
     )
     fig_bar.add_vline(
         x=35.4,
         line_dash="dash",
         line_color="#ca8a04",
-        annotation_text="Moderate threshold",
+        annotation_text="Moderate",
         annotation_font_color="#ca8a04",
         annotation_position="top",
         annotation_font_size=11,
