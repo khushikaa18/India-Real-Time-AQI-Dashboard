@@ -134,7 +134,7 @@ st.markdown("""
 
 # ─── Header ──────────────────────────────────────────────────────────────────────
 st.markdown('''
-<div style="padding-top:8px;margin-bottom:4px;">
+<div style="padding-top:20px;margin-bottom:4px;">
     <div style="font-size:14px;color:#64748b;font-weight:500;letter-spacing:0.5px;margin-bottom:2px;">INDIA REAL-TIME</div>
     <div style="font-size:36px;font-weight:800;line-height:1.1;">
         <span style="color:#0f172a;">AQI </span>
