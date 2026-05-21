@@ -206,7 +206,15 @@ if city_data:
         yaxis=dict(gridcolor="#e2e8f0"),
         margin=dict(l=0, r=20, t=40, b=0),
     )
-    fig_bar.add_vline(x=35.4, line_dash="dash", line_color="#ca8a04", annotation_text="Moderate threshold", annotation_font_color="#ca8a04")
+    fig_bar.add_vline(
+        x=35.4,
+        line_dash="dash",
+        line_color="#ca8a04",
+        annotation_text="Moderate threshold",
+        annotation_font_color="#ca8a04",
+        annotation_position="top",
+        annotation_font_size=11,
+    )
     st.plotly_chart(fig_bar, use_container_width=True)
 
 # ─── Deep Dive ───────────────────────────────────────────────────────────────────
