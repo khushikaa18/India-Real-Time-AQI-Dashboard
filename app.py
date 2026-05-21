@@ -100,7 +100,7 @@ with st.sidebar:
         ("🟡", "Satisfactory", "12-35 ug/m3",   "#ca8a04"),
         ("🟠", "Moderate",     "35-55 ug/m3",   "#ea580c"),
         ("🔴", "Poor",         "55-150 ug/m3",  "#dc2626"),
-        ("🟣", "Very Poor",    "150-250 ug/m3", "#7f1d1d"),
+        ("🟤", "Very Poor",    "150-250 ug/m3", "#7f1d1d"),
         ("⚫", "Severe",       "250+ ug/m3",    "#9f1239"),
     ]
     for emoji, label, rng, clr in scale:
