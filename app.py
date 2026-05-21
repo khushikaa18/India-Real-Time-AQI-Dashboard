@@ -33,7 +33,7 @@ def get_aqi_category(pm25):
     if pm25 <= 12:
         return "Good", "#16a34a"
     elif pm25 <= 35.4:
-        return "Satisfactory", "#ca8a04"
+        return "Satisfactory", "##fcd703"
     elif pm25 <= 55.4:
         return "Moderate", "#ea580c"
     elif pm25 <= 150.4:
