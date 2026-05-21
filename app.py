@@ -96,12 +96,12 @@ with st.sidebar:
     st.divider()
     st.markdown('<div style="font-size:12px;font-weight:600;color:#374151;margin-bottom:8px;">AQI SCALE (PM2.5)</div>', unsafe_allow_html=True)
     scale = [
-        ("🟢", "Good",        "0–12 µg/m³",   "#16a34a"),
-        ("🟡", "Satisfactory","12–35 µg/m³",  "#ca8a04"),
-        ("🟠", "Moderate",    "35–55 µg/m³",  "#ea580c"),
-        ("🔴", "Poor",        "55–150 µg/m³", "#dc2626"),
-        ("🟣", "Very Poor",   "150–250 µg/m³","#7c3aed"),
-        ("⚫", "Severe",      "250+ µg/m³",   "#9f1239"),
+        ("🟢", "Good",         "0-12 ug/m3",    "#16a34a"),
+        ("🟡", "Satisfactory", "12-35 ug/m3",   "#ca8a04"),
+        ("🟠", "Moderate",     "35-55 ug/m3",   "#ea580c"),
+        ("🔴", "Poor",         "55-150 ug/m3",  "#dc2626"),
+        ("🟣", "Very Poor",    "150-250 ug/m3", "#7c3aed"),
+        ("⚫", "Severe",       "250+ ug/m3",    "#9f1239"),
     ]
     for emoji, label, rng, clr in scale:
         st.markdown(f'<div style="display:flex;align-items:center;gap:8px;padding:3px 0;font-size:12px;"><span>{emoji}</span><span style="color:{clr};font-weight:600;">{label}</span><span style="color:#94a3b8;margin-left:auto;">{rng}</span></div>', unsafe_allow_html=True)
@@ -112,6 +112,7 @@ with st.sidebar:
 st.markdown("""
 <style>
     .block-container { padding-top: 1.5rem !important; }
+    h1 { font-size: 2rem !important; font-weight: 800 !important; color: #0f172a !important; }
     [data-testid="metric-container"] {
         background: #ffffff;
         border: 1px solid #e2e8f0;
@@ -133,11 +134,6 @@ st.markdown("""
 
 # ─── Header ──────────────────────────────────────────────────────────────────────
 st.title("🌍 India Real-Time AQI Dashboard")
-st.markdown("""
-<style>
-    .block-container { padding-top: 1.5rem !important; }
-    h1 { font-size: 2rem !important; font-weight: 800 !important; color: #0f172a !important; }
-    ...
 st.caption(f"Last refreshed: {datetime.now().strftime('%d %b %Y, %I:%M %p')}  ·  Deep dive: **{selected_city}**")
 
 conn = init_db()
@@ -174,8 +170,18 @@ if city_data:
     card_html = '<div style="display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:1.5rem;">'
     for _, row in df_all.iterrows():
         c = row['Color']
-        bg = "rgba(0,0,0,0.02)"
-        card_html += f"""<div style="background:#ffffff;border:1px solid #e2e8f0;border-top:4px solid {c};border-radius:12px;padding:16px;box-shadow:0 1px 4px rgba(0,0,0,0.06);"><div style="font-size:12px;font-weight:600;color:#64748b;margin-bottom:8px;text-transform:uppercase;letter-spacing:0.5px;">{row['City']}</div><div style="font-size:32px;font-weight:800;color:{c};line-height:1;margin-bottom:4px;">{row['PM2.5'] or 'N/A'}</div><div style="font-size:11px;color:#94a3b8;margin-bottom:10px;">PM2.5 &micro;g/m&sup3;</div><div style="display:inline-block;font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;color:{c};background:rgba(0,0,0,0.04);border:1px solid {c};">{row['Category']}</div></div>"""
+        card_html += (
+            f'<div style="background:#ffffff;border:1px solid #e2e8f0;border-top:4px solid {c};'
+            f'border-radius:12px;padding:16px;box-shadow:0 1px 4px rgba(0,0,0,0.06);">'
+            f'<div style="font-size:12px;font-weight:600;color:#64748b;margin-bottom:8px;'
+            f'text-transform:uppercase;letter-spacing:0.5px;">{row["City"]}</div>'
+            f'<div style="font-size:32px;font-weight:800;color:{c};line-height:1;margin-bottom:4px;">'
+            f'{row["PM2.5"] or "N/A"}</div>'
+            f'<div style="font-size:11px;color:#94a3b8;margin-bottom:10px;">PM2.5 ug/m3</div>'
+            f'<div style="display:inline-block;font-size:11px;font-weight:600;padding:3px 10px;'
+            f'border-radius:20px;color:{c};background:rgba(0,0,0,0.04);border:1px solid {c};">'
+            f'{row["Category"]}</div></div>'
+        )
     card_html += '</div>'
     st.markdown(card_html, unsafe_allow_html=True)
 
@@ -187,7 +193,7 @@ if city_data:
         x="PM2.5", y="City", orientation="h",
         color="PM2.5",
         color_continuous_scale=["#16a34a", "#ca8a04", "#ea580c", "#dc2626", "#7c3aed"],
-        title="PM2.5 Levels Across Indian Cities (µg/m³)",
+        title="PM2.5 Levels Across Indian Cities (ug/m3)",
         height=380,
     )
     fig_bar.update_layout(
@@ -225,33 +231,35 @@ if data:
         st.success(f"✅ **{selected_city} AQI is {cat}** — Air quality is acceptable.")
 
     m1, m2, m3, m4 = st.columns(4)
-    m1.metric("PM2.5 (µg/m³)", f"{round(pm25,1) if pm25 else 'N/A'}")
-    m2.metric("PM10 (µg/m³)", f"{round(pm10,1) if pm10 else 'N/A'}")
-    m3.metric("Ozone (µg/m³)", f"{round(ozone,1) if ozone else 'N/A'}")
-    m4.metric("NO2 (µg/m³)", f"{round(no2,1) if no2 else 'N/A'}")
+    m1.metric("PM2.5 (ug/m3)", f"{round(pm25,1) if pm25 else 'N/A'}")
+    m2.metric("PM10 (ug/m3)",  f"{round(pm10,1) if pm10 else 'N/A'}")
+    m3.metric("Ozone (ug/m3)", f"{round(ozone,1) if ozone else 'N/A'}")
+    m4.metric("NO2 (ug/m3)",   f"{round(no2,1) if no2 else 'N/A'}")
 
     hourly = data.get("hourly", {})
     if hourly and "time" in hourly:
         df_hourly = pd.DataFrame({
-            "Time": pd.to_datetime(hourly["time"]),
+            "Time":  pd.to_datetime(hourly["time"]),
             "PM2.5": hourly.get("pm2_5", []),
-            "PM10": hourly.get("pm10", []),
+            "PM10":  hourly.get("pm10", []),
             "Ozone": hourly.get("ozone", []),
-            "NO2": hourly.get("nitrogen_dioxide", []),
+            "NO2":   hourly.get("nitrogen_dioxide", []),
         }).dropna()
 
         fig_trend = go.Figure()
         fig_trend.add_trace(go.Scatter(x=df_hourly["Time"], y=df_hourly["PM2.5"], name="PM2.5", line=dict(color="#ea580c", width=2)))
-        fig_trend.add_trace(go.Scatter(x=df_hourly["Time"], y=df_hourly["PM10"], name="PM10", line=dict(color="#dc2626", width=2)))
+        fig_trend.add_trace(go.Scatter(x=df_hourly["Time"], y=df_hourly["PM10"],  name="PM10",  line=dict(color="#dc2626", width=2)))
         fig_trend.add_trace(go.Scatter(x=df_hourly["Time"], y=df_hourly["Ozone"], name="Ozone", line=dict(color="#16a34a", width=2)))
-        fig_trend.add_trace(go.Scatter(x=df_hourly["Time"], y=df_hourly["NO2"], name="NO2", line=dict(color="#7c3aed", width=2)))
-        fig_trend.add_hrect(y0=0, y1=35.4, fillcolor="#16a34a", opacity=0.06, line_width=0)
-        fig_trend.add_hrect(y0=35.4, y1=55.4, fillcolor="#ca8a04", opacity=0.06, line_width=0)
+        fig_trend.add_trace(go.Scatter(x=df_hourly["Time"], y=df_hourly["NO2"],   name="NO2",   line=dict(color="#7c3aed", width=2)))
+        fig_trend.add_hrect(y0=0,    y1=35.4,  fillcolor="#16a34a", opacity=0.06, line_width=0)
+        fig_trend.add_hrect(y0=35.4, y1=55.4,  fillcolor="#ca8a04", opacity=0.06, line_width=0)
         fig_trend.add_hrect(y0=55.4, y1=150.4, fillcolor="#ea580c", opacity=0.06, line_width=0)
         fig_trend.update_layout(
             title=f"24-Hour Pollutant Trend — {selected_city}",
-            xaxis_title="Time", yaxis_title="Concentration (µg/m³)",
-            plot_bgcolor="#f8fafc", paper_bgcolor="#ffffff",
+            xaxis_title="Time",
+            yaxis_title="Concentration (ug/m3)",
+            plot_bgcolor="#f8fafc",
+            paper_bgcolor="#ffffff",
             font_color="#1e293b",
             xaxis=dict(gridcolor="#e2e8f0"),
             yaxis=dict(gridcolor="#e2e8f0"),
@@ -265,7 +273,7 @@ if data:
             r=[pm25, pm10, ozone, no2, pm25],
             theta=["PM2.5", "PM10", "Ozone", "NO2", "PM2.5"],
             fill="toself",
-            fillcolor=f"rgba(234,88,12,0.15)",
+            fillcolor="rgba(234,88,12,0.15)",
             line=dict(color="#ea580c"),
             name=selected_city
         ))
@@ -286,14 +294,16 @@ if data:
             hist = get_history(conn, selected_city, 48)
             if not hist.empty:
                 hist["timestamp"] = pd.to_datetime(hist["timestamp"])
-                fig_hist = px.line(hist, x="timestamp", y="pm25",
+                fig_hist = px.line(
+                    hist, x="timestamp", y="pm25",
                     title="Stored History — PM2.5",
-                    labels={"pm25": "PM2.5 (µg/m³)", "timestamp": "Time"},
+                    labels={"pm25": "PM2.5 (ug/m3)", "timestamp": "Time"},
                     color_discrete_sequence=["#7c3aed"],
                     height=350,
                 )
                 fig_hist.update_layout(
-                    plot_bgcolor="#f8fafc", paper_bgcolor="#ffffff",
+                    plot_bgcolor="#f8fafc",
+                    paper_bgcolor="#ffffff",
                     font_color="#1e293b",
                     xaxis=dict(gridcolor="#e2e8f0"),
                     yaxis=dict(gridcolor="#e2e8f0"),
@@ -301,6 +311,7 @@ if data:
                 st.plotly_chart(fig_hist, use_container_width=True)
             else:
                 st.info("History builds as you refresh. Check back in a few minutes!")
+
 else:
     st.error("Could not fetch data. Check your internet connection.")
 
