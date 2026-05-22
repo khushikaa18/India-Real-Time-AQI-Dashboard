@@ -56,6 +56,11 @@ def init_db():
             ozone REAL, no2 REAL, category TEXT
         )
     """)
+    # Auto-delete readings older than 24 hours
+    conn.execute("""
+        DELETE FROM readings 
+        WHERE timestamp < datetime('now', '-24 hours')
+    """)
     conn.commit()
     return conn
 
