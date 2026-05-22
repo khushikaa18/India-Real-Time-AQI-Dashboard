@@ -262,7 +262,9 @@ with st.sidebar:
     """, unsafe_allow_html=True)
 
 # ─── Header ───────────────────────────────────────────────────────────────────────
-now_str = datetime.now().strftime('%d %b %Y, %I:%M %p')
+from datetime import timezone, timedelta
+IST = timezone(timedelta(hours=5, minutes=30))
+now_str = datetime.now(IST).strftime('%d %b %Y, %I:%M %p')
 st.markdown(f"""
 <div style="margin-bottom:24px;animation:slide-up 0.5s ease-out;">
     <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px;">
