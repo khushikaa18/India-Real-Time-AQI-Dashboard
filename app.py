@@ -41,7 +41,7 @@ def get_aqi_category(pm25):
     elif pm25 <= 150.4:
         return "Poor", "#dc2626", "#fef2f2"
     elif pm25 <= 250.4:
-        return "Very Poor", "#7f1d1d", "#f5f3ff"
+        return "Very Poor", "#7f1d1d", "#fdf2f2"
     else:
         return "Severe", "#be123c", "#fff1f2"
 
