@@ -73,8 +73,11 @@ def save_reading(conn, city, pm25, pm10, ozone, no2, category):
 
 def get_history(conn, city, hours=24):
     df = pd.read_sql_query(
-        "SELECT * FROM readings WHERE city=? ORDER BY timestamp DESC LIMIT ?",
-        conn, params=(city, hours)
+        """SELECT * FROM readings 
+           WHERE city=? 
+           AND timestamp >= datetime('now', ?)
+           ORDER BY timestamp ASC""",
+        conn, params=(city, f'-{hours} hours')
     )
     return df
 
