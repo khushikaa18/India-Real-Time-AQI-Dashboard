@@ -50,7 +50,7 @@ def init_history():
     if "aqi_history" not in st.session_state:
         st.session_state.aqi_history = {}
 
-def save_reading(city, pm25, pm10, ozone, no2, cat):
+def save_reading(city, pm25, pm10, ozone, no2, category):
     from datetime import timezone, timedelta
     IST = timezone(timedelta(hours=5, minutes=30))
     now_ist = datetime.now(IST).replace(tzinfo=None)
