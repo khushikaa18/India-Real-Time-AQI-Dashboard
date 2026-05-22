@@ -314,7 +314,7 @@ with st.spinner("Fetching live data…"):
                 "Color": color,
                 "BgTint": bg_tint,
             })
-            save_reading(conn, city, pm25, pm10, ozone, no2, cat)
+            save_reading(city, pm25, pm10, ozone, no2, category)
 
 if city_data:
     df_all = pd.DataFrame(city_data)
