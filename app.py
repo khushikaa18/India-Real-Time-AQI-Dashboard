@@ -533,6 +533,7 @@ if data:
                         "timestamp": pd.to_datetime(hourly["time"]),
                         "pm25": hourly.get("pm2_5", []),
                     }).dropna()
+                    df_h = df_h[df_h["timestamp"] <= datetime.now(IST).replace(tzinfo=None)]
                     fig_hist = go.Figure()
                     fig_hist.add_trace(go.Scatter(
                         x=df_h["timestamp"], y=df_h["pm25"],
