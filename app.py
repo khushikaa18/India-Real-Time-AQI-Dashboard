@@ -499,7 +499,7 @@ if data:
             st.plotly_chart(fig_radar, use_container_width=True)
 
         with col2:
-            hist = get_history(conn, selected_city, 48)
+            hist = get_history(conn, selected_city, 12)
             if not hist.empty:
                 hist["timestamp"] = pd.to_datetime(hist["timestamp"])
                 fig_hist = go.Figure()
