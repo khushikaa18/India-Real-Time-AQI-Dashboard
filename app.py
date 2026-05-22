@@ -56,10 +56,9 @@ def init_db():
             ozone REAL, no2 REAL, category TEXT
         )
     """)
-    # Auto-delete readings older than 24 hours
     conn.execute("""
         DELETE FROM readings 
-        WHERE timestamp < datetime('now', '-24 hours')
+        WHERE timestamp < datetime('now', '+5 hours', '+30 minutes', '-24 hours')
     """)
     conn.commit()
     return conn
@@ -86,7 +85,7 @@ def get_history(conn, city, hours=24):
     df = pd.read_sql_query(
         """SELECT * FROM readings 
            WHERE city=? 
-           AND timestamp >= datetime('now', ?)
+           AND timestamp >= datetime('now', '+5 hours', '+30 minutes', ?)
            ORDER BY timestamp ASC""",
         conn, params=(city, f'-{hours} hours')
     )
