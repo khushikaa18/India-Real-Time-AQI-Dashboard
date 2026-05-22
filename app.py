@@ -269,7 +269,7 @@ st.markdown(f"""
 </div>
 """, unsafe_allow_html=True)
 
-conn = init_db()
+init_history()
 
 # ─── Section Title Helper ─────────────────────────────────────────────────────────
 def section_title(emoji, text):
