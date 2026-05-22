@@ -58,13 +58,17 @@ def init_db():
     """)
     conn.execute("""
         DELETE FROM readings 
-        WHERE timestamp < datetime('now', '+5 hours', '+30 minutes', '-24 hours')
+        WHERE timestamp < strftime('%Y-%m-%d %H:%M:%S', 'now', '+5 hours', '+30 minutes', '-24 hours')
     """)
     conn.commit()
     return conn
 
 def save_reading(conn, city, pm25, pm10, ozone, no2, category):
-    # Only save if last reading for this city was more than 10 minutes ago
+    from datetime import timezone, timedelta
+    IST = timezone(timedelta(hours=5, minutes=30))
+    now_ist = datetime.now(IST).replace(tzinfo=None)
+    now_str = now_ist.strftime("%Y-%m-%d %H:%M:%S")
+
     cursor = conn.execute(
         "SELECT timestamp FROM readings WHERE city=? ORDER BY timestamp DESC LIMIT 1",
         (city,)
@@ -72,22 +76,27 @@ def save_reading(conn, city, pm25, pm10, ozone, no2, category):
     last = cursor.fetchone()
     if last:
         last_time = datetime.strptime(last[0], "%Y-%m-%d %H:%M:%S")
-        diff = (datetime.now() - last_time).total_seconds()
-        if diff < 600:  # less than 10 minutes
-            return  # skip saving
+        diff = (now_ist - last_time).total_seconds()
+        if diff < 600:
+            return
     conn.execute(
         "INSERT INTO readings (city, timestamp, pm25, pm10, ozone, no2, category) VALUES (?,?,?,?,?,?,?)",
-        (city, datetime.now().strftime("%Y-%m-%d %H:%M:%S"), pm25, pm10, ozone, no2, category)
+        (city, now_str, pm25, pm10, ozone, no2, category)
     )
     conn.commit()
 
 def get_history(conn, city, hours=24):
+    from datetime import timezone, timedelta
+    IST = timezone(timedelta(hours=5, minutes=30))
+    cutoff = (datetime.now(IST).replace(tzinfo=None) - 
+              __import__('datetime').timedelta(hours=hours))
+    cutoff_str = cutoff.strftime("%Y-%m-%d %H:%M:%S")
     df = pd.read_sql_query(
         """SELECT * FROM readings 
            WHERE city=? 
-           AND timestamp >= datetime('now', '+5 hours', '+30 minutes', ?)
+           AND timestamp >= ?
            ORDER BY timestamp ASC""",
-        conn, params=(city, f'-{hours} hours')
+        conn, params=(city, cutoff_str)
     )
     return df
 
