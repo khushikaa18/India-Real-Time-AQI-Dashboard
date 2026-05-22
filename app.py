@@ -223,7 +223,7 @@ with st.sidebar:
         ("Satisfactory", "12 – 35",  "#f59e0b"),
         ("Moderate",     "35 – 55",  "#ea580c"),
         ("Poor",         "55 – 150", "#dc2626"),
-        ("Very Poor",    "150 – 250","#7c3aed"),
+        ("Very Poor",    "150 – 250","#7f1d1d"),
         ("Severe",       "250+",     "#be123c"),
     ]
     for label, rng, clr in scale_items:
