@@ -534,6 +534,12 @@ if data:
                         "pm25": hourly.get("pm2_5", []),
                     }).dropna()
                     df_h = df_h[df_h["timestamp"] <= datetime.now(IST).replace(tzinfo=None)]
+                    # Add current live reading as latest point
+                    current_point = pd.DataFrame({
+                        "timestamp": [datetime.now(IST).replace(tzinfo=None)],
+                        "pm25": [curr.get("pm2_5")]
+                    })
+                    df_h = pd.concat([df_h, current_point], ignore_index=True)
                     fig_hist = go.Figure()
                     fig_hist.add_trace(go.Scatter(
                         x=df_h["timestamp"], y=df_h["pm25"],
