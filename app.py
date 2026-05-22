@@ -65,6 +65,17 @@ def init_db():
     return conn
 
 def save_reading(conn, city, pm25, pm10, ozone, no2, category):
+    # Only save if last reading for this city was more than 10 minutes ago
+    cursor = conn.execute(
+        "SELECT timestamp FROM readings WHERE city=? ORDER BY timestamp DESC LIMIT 1",
+        (city,)
+    )
+    last = cursor.fetchone()
+    if last:
+        last_time = datetime.strptime(last[0], "%Y-%m-%d %H:%M:%S")
+        diff = (datetime.now() - last_time).total_seconds()
+        if diff < 600:  # less than 10 minutes
+            return  # skip saving
     conn.execute(
         "INSERT INTO readings (city, timestamp, pm25, pm10, ozone, no2, category) VALUES (?,?,?,?,?,?,?)",
         (city, datetime.now().strftime("%Y-%m-%d %H:%M:%S"), pm25, pm10, ozone, no2, category)
