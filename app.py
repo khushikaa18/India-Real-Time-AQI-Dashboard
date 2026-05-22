@@ -46,59 +46,40 @@ def get_aqi_category(pm25):
         return "Severe", "#be123c", "#fff1f2"
 
 # ─── Database ─────────────────────────────────────────────────────────────────────
-def init_db():
-    conn = sqlite3.connect("aqi_history.db")
-    conn.execute("""
-        CREATE TABLE IF NOT EXISTS readings (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            city TEXT, timestamp TEXT,
-            pm25 REAL, pm10 REAL,
-            ozone REAL, no2 REAL, category TEXT
-        )
-    """)
-    conn.execute("""
-        DELETE FROM readings 
-        WHERE timestamp < strftime('%Y-%m-%d %H:%M:%S', 'now', '+5 hours', '+30 minutes', '-24 hours')
-    """)
-    conn.commit()
-    return conn
+def init_history():
+    if "aqi_history" not in st.session_state:
+        st.session_state.aqi_history = {}
 
-def save_reading(conn, city, pm25, pm10, ozone, no2, category):
+def save_reading(city, pm25, pm10, ozone, no2, cat):
     from datetime import timezone, timedelta
     IST = timezone(timedelta(hours=5, minutes=30))
     now_ist = datetime.now(IST).replace(tzinfo=None)
-    now_str = now_ist.strftime("%Y-%m-%d %H:%M:%S")
 
-    cursor = conn.execute(
-        "SELECT timestamp FROM readings WHERE city=? ORDER BY timestamp DESC LIMIT 1",
-        (city,)
-    )
-    last = cursor.fetchone()
-    if last:
-        last_time = datetime.strptime(last[0], "%Y-%m-%d %H:%M:%S")
+    if city not in st.session_state.aqi_history:
+        st.session_state.aqi_history[city] = []
+
+    history = st.session_state.aqi_history[city]
+
+    # Only save if 10 min passed since last entry
+    if history:
+        last_time = history[-1]["timestamp"]
         diff = (now_ist - last_time).total_seconds()
         if diff < 600:
             return
-    conn.execute(
-        "INSERT INTO readings (city, timestamp, pm25, pm10, ozone, no2, category) VALUES (?,?,?,?,?,?,?)",
-        (city, now_str, pm25, pm10, ozone, no2, category)
-    )
-    conn.commit()
 
-def get_history(conn, city, hours=24):
-    from datetime import timezone, timedelta
-    IST = timezone(timedelta(hours=5, minutes=30))
-    cutoff = (datetime.now(IST).replace(tzinfo=None) - 
-              __import__('datetime').timedelta(hours=hours))
-    cutoff_str = cutoff.strftime("%Y-%m-%d %H:%M:%S")
-    df = pd.read_sql_query(
-        """SELECT * FROM readings 
-           WHERE city=? 
-           AND timestamp >= ?
-           ORDER BY timestamp ASC""",
-        conn, params=(city, cutoff_str)
-    )
-    return df
+    history.append({
+        "timestamp": now_ist,
+        "pm25": pm25,
+        "pm10": pm10,
+        "ozone": ozone,
+        "no2": no2,
+        "category": category,
+    })
+
+def get_history(city):
+    if city not in st.session_state.aqi_history:
+        return pd.DataFrame()
+    return pd.DataFrame(st.session_state.aqi_history[city])
 
 # ─── API Fetch ────────────────────────────────────────────────────────────────────
 @st.cache_data(ttl=600)
@@ -523,39 +504,53 @@ if data:
             st.plotly_chart(fig_radar, use_container_width=True)
 
         with col2:
-            hist = get_history(conn, selected_city, 12)
-            if not hist.empty:
-                hist["timestamp"] = pd.to_datetime(hist["timestamp"])
+            hist = get_history(selected_city)
+            if not hist.empty and len(hist) >= 2:
                 fig_hist = go.Figure()
                 fig_hist.add_trace(go.Scatter(
                     x=hist["timestamp"], y=hist["pm25"],
-                    mode="lines",
+                    mode="lines+markers",
                     line=dict(color="#7c3aed", width=2.5, shape="spline"),
+                    marker=dict(size=6, color="#7c3aed"),
                     fill="tozeroy",
-                    fillcolor="rgba(124, 58, 237, 0.05)",
+                    fillcolor="rgba(124,58,237,0.05)",
                     hovertemplate="<b>PM2.5</b>: %{y:.1f} µg/m³<br>%{x|%d %b %H:%M}<extra></extra>",
                 ))
                 fig_hist.update_layout(
                     **CHART_LAYOUT,
                     title=dict(
-                        text="<b>Stored History</b><br><span style='font-size:12px;color:#94a3b8;'>PM2.5 readings over time</span>",
+                        text="<b>Stored History</b><br><span style='font-size:12px;color:#94a3b8;'>PM2.5 readings over time (IST)</span>",
                         font=dict(size=14, color="#0f172a"),
                     ),
                     height=380,
                 )
                 st.plotly_chart(fig_hist, use_container_width=True)
             else:
-                st.markdown("""
-                <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;
-                            height:300px;border:1.5px dashed #e2e8f0;border-radius:14px;background:#fafafa;">
-                    <div style="font-size:28px;margin-bottom:8px;opacity:0.3;">📈</div>
-                    <div style="font-size:13px;color:#94a3b8;text-align:center;line-height:1.6;">
-                        History builds as you refresh.<br>Check back in a few minutes!
-                    </div>
-                </div>
-                """, unsafe_allow_html=True)
-else:
-    st.error("Could not fetch data. Check your internet connection.")
+                # Show API hourly data as fallback
+                hourly = data.get("hourly", {})
+                if hourly and "time" in hourly:
+                    df_h = pd.DataFrame({
+                        "timestamp": pd.to_datetime(hourly["time"]),
+                        "pm25": hourly.get("pm2_5", []),
+                    }).dropna()
+                    fig_hist = go.Figure()
+                    fig_hist.add_trace(go.Scatter(
+                        x=df_h["timestamp"], y=df_h["pm25"],
+                        mode="lines",
+                        line=dict(color="#7c3aed", width=2.5, shape="spline"),
+                        fill="tozeroy",
+                        fillcolor="rgba(124,58,237,0.05)",
+                        hovertemplate="<b>PM2.5</b>: %{y:.1f} µg/m³<br>%{x|%d %b %H:%M}<extra></extra>",
+                    ))
+                    fig_hist.update_layout(
+                        **CHART_LAYOUT,
+                        title=dict(
+                            text="<b>24h API History</b><br><span style='font-size:12px;color:#94a3b8;'>PM2.5 from Open-Meteo hourly data</span>",
+                            font=dict(size=14, color="#0f172a"),
+                        ),
+                        height=380,
+                    )
+                    st.plotly_chart(fig_hist, use_container_width=True)
 
 # ─── Raw Table ────────────────────────────────────────────────────────────────────
 if city_data:
