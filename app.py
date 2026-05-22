@@ -41,9 +41,9 @@ def get_aqi_category(pm25):
     elif pm25 <= 150.4:
         return "Poor", "#dc2626", "#fef2f2"
     elif pm25 <= 250.4:
-        return "Very Poor", "#7f1d1d", "#fdf2f2"
+        return "Very Poor", "#be123c", "#fdf2f2"
     else:
-        return "Severe", "#be123c", "#fff1f2"
+        return "Severe", "#7f1d1d", "#fff1f2"
 
 # ─── Database ─────────────────────────────────────────────────────────────────────
 def init_history():
@@ -223,8 +223,8 @@ with st.sidebar:
         ("Satisfactory", "12 – 35",  "#f59e0b"),
         ("Moderate",     "35 – 55",  "#ea580c"),
         ("Poor",         "55 – 150", "#dc2626"),
-        ("Very Poor",    "150 – 250","#7f1d1d"),
-        ("Severe",       "250+",     "#be123c"),
+        ("Very Poor",    "150 – 250","#be123c"),
+        ("Severe",       "250+",     "#7f1d1d"),
     ]
     for label, rng, clr in scale_items:
         st.markdown(f"""
