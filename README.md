@@ -53,17 +53,53 @@ India-Real-Time-AQI-Dashboard/
 │── README.md
 │── assets/
 │── data/
+```
+## Installation & Setup
 
-## 🧱 Tech Stack
+### 1. Clone the Repository
 
-| Tool | Purpose |
-|------|---------|
-| Python | Core language |
-| Streamlit | Web app framework + deployment |
-| Plotly | Interactive charts (bar, line, radar) |
-| Pandas | Data wrangling |
-| SQLite | Local history storage |
-| Requests | API calls |
-| Open-Meteo | Free real-time AQI data |
+```bash
+git clone https://github.com/khushikaa18/India-Real-Time-AQI-Dashboard.git
+```
+
+### 2️. Navigate to Project Directory
+
+```bash
+cd India-Real-Time-AQI-Dashboard
+```
+
+### 3️. Install Dependencies
+
+```bash
+pip install -r requirements.txt
+```
+
+### 4️. Run the Streamlit App
+
+```bash
+streamlit run app.py
+```
 
 ---
+
+## Live Demo
+
+🔗 https://india-real-time-aqi.streamlit.app/
+
+---
+
+## Learning Outcomes
+
+This project helped in gaining practical experience with:
+
+- API Integration
+- Real-Time Data Pipelines
+- Time-Series Analysis
+- Interactive Data Visualization
+- Dashboard Development
+- Responsive UI Design
+- Streamlit Cloud Deployment
+
+---
+
+## If you found this project useful, consider giving it a star!
