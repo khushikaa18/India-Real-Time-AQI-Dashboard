@@ -453,7 +453,7 @@ if city_data:
         df_sorted,
         x="PM2.5", y="City", orientation="h",
         color="PM2.5",
-        color_continuous_scale=["#059669","#f59e0b","#ea580c","#dc2626","#7c3aed"],
+        color_continuous_scale=["#059669","#f59e0b","#ea580c","#dc2626","#be123c"],
         height=CHART_HEIGHT,
     )
     fig_bar.update_traces(marker_line_width=0, marker_cornerradius=5)
