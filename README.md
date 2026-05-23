@@ -2,7 +2,7 @@
 
 A real-time air quality monitoring dashboard for 10 major Indian cities, built with Python, Streamlit, and the Open-Meteo Air Quality API. No API key required.
 
-**Live Demo → [https://india-real-time-aqi.streamlit.app/](#)**
+**Live Demo → [https://india-real-time-aqi.streamlit.app](#)**
 
 ![Python](https://img.shields.io/badge/Python-3.10+-blue) ![Streamlit](https://img.shields.io/badge/Streamlit-1.35-red) ![Plotly](https://img.shields.io/badge/Plotly-5.22-purple) ![License](https://img.shields.io/badge/License-MIT-green)
 
