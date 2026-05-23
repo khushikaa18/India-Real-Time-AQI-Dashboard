@@ -14,7 +14,7 @@ st.set_page_config(
     layout="wide",
     initial_sidebar_state="expanded"
 )
-# ─── Detect Browser Width via JavaScript ──────────────────────────────────────────
+# ─── Detect Browser Width via JavaScript ────────────────────────────────────────
 # st_javascript runs JS in the user's browser and returns the result to Python.
 # window.innerWidth gives the viewport width in pixels.
 window_width = st_javascript("window.innerWidth") or 1200  # fallback to desktop
