@@ -569,7 +569,7 @@ if data:
 
     # ── Radar + History ────────────────────────────────────────────────────────
     if all([pm25, pm10, ozone, no2]):
-         if IS_MOBILE:
+        if IS_MOBILE:
             col1, col2 = st.columns(1), st.columns(1)
             col1 = col1[0]
             col2 = col2[0]
