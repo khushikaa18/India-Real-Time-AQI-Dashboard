@@ -6,6 +6,7 @@ import plotly.graph_objects as go
 from datetime import datetime
 import sqlite3
 import time
+from streamlit_javascript import st_javascript
 
 st.set_page_config(
     page_title="India AQI Monitor",
@@ -13,6 +14,27 @@ st.set_page_config(
     layout="wide",
     initial_sidebar_state="expanded"
 )
+# ─── Detect Browser Width via JavaScript ──────────────────────────────────────────
+# st_javascript runs JS in the user's browser and returns the result to Python.
+# window.innerWidth gives the viewport width in pixels.
+window_width = st_javascript("window.innerWidth") or 1200  # fallback to desktop
+# Define responsive breakpoints
+IS_MOBILE = window_width < 768       # phones
+IS_TABLET = 768 <= window_width < 1024  # tablets / small laptops
+IS_DESKTOP = window_width >= 1024    # desktops / large screens
+# Dynamic grid columns based on detected width
+if IS_MOBILE:
+    CARD_COLS = 1
+    METRIC_COLS = 2
+    CHART_HEIGHT = 300
+elif IS_TABLET:
+    CARD_COLS = 2
+    METRIC_COLS = 2
+    CHART_HEIGHT = 350
+else:
+    CARD_COLS = 5
+    METRIC_COLS = 4
+    CHART_HEIGHT = 400
 
 # ─── City Data ────────────────────────────────────────────────────────────────────
 CITIES = {
@@ -185,6 +207,72 @@ st.markdown("""
         0%, 100% { opacity: 0.5; transform: scale(1); }
         50% { opacity: 1; transform: scale(1.15); }
     }
+       /* ═══════════════════════════════════════════════════════
+       RESPONSIVE BREAKDOWNS — window.innerWidth in CSS
+       ═══════════════════════════════════════════════════════ */
+    /* ── MOBILE: < 768px ───────────────────────────────── */
+    @media screen and (max-width: 767px) {
+        .block-container {
+            padding-top: 1.5rem !important;
+            padding-bottom: 1rem !important;
+            padding-left: 0.75rem !important;
+            padding-right: 0.75rem !important;
+        }
+        /* Stack city cards in 1 column */
+        .city-cards-grid {
+            grid-template-columns: 1fr !important;
+            gap: 10px !important;
+        }
+        /* Shrink header text */
+        .responsive-header {
+            font-size: 22px !important;
+        }
+        /* Metric cards: smaller text */
+        [data-testid="metric-container"] {
+            padding: 12px 14px !important;
+            border-radius: 10px !important;
+        }
+        [data-testid="metric-container"] [data-testid="metric-value"] {
+            font-size: 20px !important;
+        }
+        [data-testid="metric-container"] label {
+            font-size: 10px !important;
+        }
+        /* Hide sidebar by default on mobile */
+        [data-testid="stSidebar"][aria-expanded="true"] {
+            min-width: 260px !important;
+            max-width: 260px !important;
+        }
+        /* Card values smaller */
+        .city-card-value {
+            font-size: 28px !important;
+        }
+    }
+    /* ── TABLET: 768px – 1024px ────────────────────────── */
+    @media screen and (min-width: 768px) and (max-width: 1023px) {
+        .block-container {
+            padding-top: 2rem !important;
+            padding-left: 1rem !important;
+            padding-right: 1rem !important;
+        }
+        /* 2-column grid for city cards */
+        .city-cards-grid {
+            grid-template-columns: repeat(2, 1fr) !important;
+            gap: 12px !important;
+        }
+        .responsive-header {
+            font-size: 26px !important;
+        }
+        .city-card-value {
+            font-size: 32px !important;
+        }
+    }
+    /* ── DESKTOP: >= 1024px (default, no changes needed) ── */
+    @media screen and (min-width: 1024px) {
+        .city-cards-grid {
+            grid-template-columns: repeat(5, 1fr) !important;
+        }
+    }
 </style>
 """, unsafe_allow_html=True)
 
@@ -246,23 +334,24 @@ with st.sidebar:
 from datetime import timezone, timedelta
 IST = timezone(timedelta(hours=5, minutes=30))
 now_str = datetime.now(IST).strftime('%d %b %Y, %I:%M %p')
+header_size = "22px" if IS_MOBILE else "26px" if IS_TABLET else "32px"
 st.markdown(f"""
 <div style="margin-bottom:24px;animation:slide-up 0.5s ease-out;">
     <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px;">
-        <div style="font-size:32px;font-weight:900;color:#0f172a;letter-spacing:-0.8px;line-height:1.1;">
+        <div class="responsive-header" style="font-size:{header_size};font-weight:900;color:#0f172a;letter-spacing:-0.8px;line-height:1.1;">
             India Real-Time
         </div>
     </div>
     <div style="display:flex;align-items:baseline;gap:10px;margin-bottom:10px;">
-        <div style="font-size:32px;font-weight:900;letter-spacing:-0.8px;line-height:1.1;">
+        <div class="responsive-header" style="font-size:{header_size};font-weight:900;letter-spacing:-0.8px;line-height:1.1;">
             <span style="color:#0f172a;">AQI </span><span style="color:#0d9488;">Dashboard</span>
         </div>
     </div>
-    <div style="display:flex;align-items:center;gap:8px;">
+    <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
         <div style="width:7px;height:7px;border-radius:50%;background:#10b981;
                     animation:breathe 2.5s ease-in-out infinite;
                     box-shadow:0 0 6px rgba(16,185,129,0.4);"></div>
-        <span style="font-size:12px;color:#64748b;font-weight:500;">
+        <span style="font-size:{('11px' if IS_MOBILE else '12px')};color:#64748b;font-weight:500;">
             Last refreshed: {now_str} · Deep dive: <strong style="color:#0f172a;">{selected_city}</strong>
         </span>
     </div>
@@ -318,40 +407,43 @@ with st.spinner("Fetching live data…"):
 
 if city_data:
     df_all = pd.DataFrame(city_data)
-
-    # ── City Cards ─────────────────────────────────────────────────────────────
-    rows = [city_data[:5], city_data[5:]]
-    for row_idx, row_data in enumerate(rows):
-        card_row = f'<div style="display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin-bottom:14px;">'
-        for i, item in enumerate(row_data):
-            c = item['Color']
-            delay = (row_idx * 5 + i) * 0.04
-            bg = item['BgTint']
-            card_row += f"""
-            <div style="
-                background: {bg};
-                border: 1px solid #e2e8f0;
-                border-left: 5px solid {c};
-                border-radius: 14px;
-                padding: 22px 20px 20px;
-                box-shadow: 0 1px 4px rgba(0,0,0,0.03);
-                transition: all 0.3s ease;
-                animation: slide-up 0.4s ease-out {delay}s both;
-                position: relative;
-            " onmouseover="this.style.boxShadow='0 6px 24px rgba(0,0,0,0.08)';this.style.transform='translateY(-3px)'"
-               onmouseout="this.style.boxShadow='0 1px 4px rgba(0,0,0,0.03)';this.style.transform='translateY(0)'">
-                <div style="font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;
-                            letter-spacing:0.8px;margin-bottom:12px;">{item['City']}</div>
-                <div style="font-size:36px;font-weight:900;color:{c};line-height:1;
-                            margin-bottom:6px;letter-spacing:-1px;">{item['PM2.5'] if item['PM2.5'] else 'N/A'}</div>
-                <div style="font-size:11px;color:#94a3b8;margin-bottom:16px;font-weight:500;">PM2.5 ug/m3</div>
-                <div style="display:inline-block;font-size:11px;font-weight:700;
-                            padding:4px 14px;border-radius:20px;
-                            color:{c};background:transparent;
-                            border:2px solid {c};">{item['Category']}</div>
-            </div>"""
-        card_row += '</div>'
-        st.markdown(card_row, unsafe_allow_html=True)
+    
+    # ── City Cards (Responsive) ────────────────────────────────────────────────
+    # Uses CSS class 'city-cards-grid' so media queries can override column count.
+    # Python-side CARD_COLS provides the inline default; CSS @media overrides it.
+    card_value_size = "28px" if IS_MOBILE else "32px" if IS_TABLET else "36px"
+    card_padding = "16px 14px 14px" if IS_MOBILE else "22px 20px 20px"
+    # Render ALL cards in a single responsive grid (instead of fixed 2 rows of 5)
+    card_grid = f'<div class="city-cards-grid" style="display:grid;grid-template-columns:repeat({CARD_COLS},1fr);gap:14px;margin-bottom:14px;">'
+    for i, item in enumerate(city_data):
+        c = item['Color']
+        delay = i * 0.04
+        bg = item['BgTint']
+        card_grid += f"""
+        <div style="
+            background: {bg};
+            border: 1px solid #e2e8f0;
+            border-left: 5px solid {c};
+            border-radius: 14px;
+            padding: {card_padding};
+            box-shadow: 0 1px 4px rgba(0,0,0,0.03);
+            transition: all 0.3s ease;
+            animation: slide-up 0.4s ease-out {delay}s both;
+            position: relative;
+        " onmouseover="this.style.boxShadow='0 6px 24px rgba(0,0,0,0.08)';this.style.transform='translateY(-3px)'"
+           onmouseout="this.style.boxShadow='0 1px 4px rgba(0,0,0,0.03)';this.style.transform='translateY(0)'">
+            <div style="font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;
+                        letter-spacing:0.8px;margin-bottom:12px;">{item['City']}</div>
+            <div class="city-card-value" style="font-size:{card_value_size};font-weight:900;color:{c};line-height:1;
+                        margin-bottom:6px;letter-spacing:-1px;">{item['PM2.5'] if item['PM2.5'] else 'N/A'}</div>
+            <div style="font-size:11px;color:#94a3b8;margin-bottom:16px;font-weight:500;">PM2.5 µg/m³</div>
+            <div style="display:inline-block;font-size:11px;font-weight:700;
+                        padding:4px 14px;border-radius:20px;
+                        color:{c};background:transparent;
+                        border:2px solid {c};">{item['Category']}</div>
+        </div>"""
+    card_grid += '</div>'
+    st.markdown(card_grid, unsafe_allow_html=True)
 
     st.divider()
 
@@ -362,7 +454,7 @@ if city_data:
         x="PM2.5", y="City", orientation="h",
         color="PM2.5",
         color_continuous_scale=["#059669","#f59e0b","#ea580c","#dc2626","#7c3aed"],
-        height=400,
+        height=CHART_HEIGHT,
     )
     fig_bar.update_traces(marker_line_width=0, marker_cornerradius=5)
     fig_bar.update_layout(
@@ -412,12 +504,20 @@ if data:
     else:
         st.success(f"✅ **{selected_city} air quality is {cat}** — Safe for outdoor activities.")
 
-    # Metric Cards
-    m1, m2, m3, m4 = st.columns(4)
-    m1.metric("PM2.5 (µg/m³)", f"{round(pm25,1) if pm25 else 'N/A'}")
-    m2.metric("PM10 (µg/m³)", f"{round(pm10,1) if pm10 else 'N/A'}")
-    m3.metric("Ozone (µg/m³)", f"{round(ozone,1) if ozone else 'N/A'}")
-    m4.metric("NO₂ (µg/m³)", f"{round(no2,1) if no2 else 'N/A'}")
+    # Metric Cards (Responsive — 2 cols on mobile/tablet, 4 on desktop)
+    if IS_MOBILE or IS_TABLET:
+        row1 = st.columns(2)
+        row1[0].metric("PM2.5 (µg/m³)", f"{round(pm25,1) if pm25 else 'N/A'}")
+        row1[1].metric("PM10 (µg/m³)", f"{round(pm10,1) if pm10 else 'N/A'}")
+        row2 = st.columns(2)
+        row2[0].metric("Ozone (µg/m³)", f"{round(ozone,1) if ozone else 'N/A'}")
+        row2[1].metric("NO₂ (µg/m³)", f"{round(no2,1) if no2 else 'N/A'}")
+    else:
+        m1, m2, m3, m4 = st.columns(4)
+        m1.metric("PM2.5 (µg/m³)", f"{round(pm25,1) if pm25 else 'N/A'}")
+        m2.metric("PM10 (µg/m³)", f"{round(pm10,1) if pm10 else 'N/A'}")
+        m3.metric("Ozone (µg/m³)", f"{round(ozone,1) if ozone else 'N/A'}")
+        m4.metric("NO₂ (µg/m³)", f"{round(no2,1) if no2 else 'N/A'}")
 
     # ── 24h Trend ──────────────────────────────────────────────────────────────
     hourly = data.get("hourly", {})
@@ -462,14 +562,19 @@ if data:
                 font=dict(size=11, color="#64748b"),
                 bgcolor="rgba(255,255,255,0)",
             ),
-            height=400,
+            height=CHART_HEIGHT,
             hovermode="x unified",
         )
         st.plotly_chart(fig_trend, use_container_width=True)
 
     # ── Radar + History ────────────────────────────────────────────────────────
     if all([pm25, pm10, ozone, no2]):
-        col1, col2 = st.columns(2)
+         if IS_MOBILE:
+            col1, col2 = st.columns(1), st.columns(1)
+            col1 = col1[0]
+            col2 = col2[0]
+        else:
+            col1, col2 = st.columns(2)
 
         with col1:
             fig_radar = go.Figure(go.Scatterpolar(
@@ -498,7 +603,7 @@ if data:
                 ),
                 paper_bgcolor="#ffffff",
                 font=dict(family="Plus Jakarta Sans, sans-serif", color="#334155"),
-                height=380,
+                height=CHART_HEIGHT - 20,
                 margin=dict(l=40, r=40, t=60, b=40),
             )
             st.plotly_chart(fig_radar, use_container_width=True)
@@ -522,7 +627,7 @@ if data:
                         text="<b>Stored History</b><br><span style='font-size:12px;color:#94a3b8;'>PM2.5 readings over time (IST)</span>",
                         font=dict(size=14, color="#0f172a"),
                     ),
-                    height=380,
+                    height=CHART_HEIGHT - 20,
                 )
                 st.plotly_chart(fig_hist, use_container_width=True)
             else:
